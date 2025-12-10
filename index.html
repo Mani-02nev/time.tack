@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time Traker | Personal Study & Skill Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- SEO -->
+  <meta name="description" content="Time Traker is a personal study and time tracker that helps you plan tasks, track skills, and visualize your learning progress." />
+  <meta name="keywords" content="Time Traker, time tracker, study tracker, todo list, learning tracker, progress tracker, student, developer, skills dashboard" />
+  <meta name="author" content="Karuppasamy M" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="Time Traker | Personal Study & Skill Tracker" />
+  <meta property="og:description" content="Plan your learning, track skills, and see clean visual dashboards with Time Traker." />
+  <meta property="og:url" content="https://Mani-02nev.github.io/time.tack/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Time Traker" />
+  <meta property="og:image" content="https://Mani-02nev.github.io/time.tack/og-image.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Time Traker | Personal Study & Skill Tracker" />
+  <meta name="twitter:description" content="Plan your learning, track skills, and see clean visual dashboards with Time Traker." />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://Mani-02nev.github.io/time.tack/" />
+
+  <!-- Bootstrap 5 CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+  />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- jsPDF + AutoTable (for PDF export) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-soft: #eff4ff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-soft: #e5e7eb;
+      --card-radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background-color: #f5f5f5;
+      color: var(--text-main);
+    }
+
+    .navbar-brand span {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .app-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 5rem;
+      padding-bottom: 3rem;
+    }
+
+    .app-card {
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-soft);
+      background-color: #ffffff;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.05);
+    }
+
+    .card-header-custom {
+      border-bottom: 1px solid rgba(229, 231, 235, 0.7);
+      background: linear-gradient(135deg, #ffffff 0%, #f9fafb 40%, #f3f4ff 100%);
+      border-radius: var(--card-radius) var(--card-radius) 0 0 !important;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background-color: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .badge-status {
+      border-radius: 999px;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.75rem;
+    }
+
+    .badge-status.done {
+      background: rgba(22, 163, 74, 0.08);
+      color: #15803d;
+    }
+
+    .badge-status.pending {
+      background: rgba(234, 179, 8, 0.08);
+      color: #854d0e;
+    }
+
+    .table > :not(caption) > * > * {
+      padding: 0.55rem 0.5rem;
+      vertical-align: middle;
+      font-size: 0.87rem;
+    }
+
+    .form-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 999px;
+      font-size: 0.9rem;
+    }
+
+    .btn-pill { border-radius: 999px; }
+
+    .btn-primary-soft {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary-soft:hover {
+      background-color: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #ffffff;
+    }
+
+    .btn-icon {
+      border-radius: 999px;
+      padding-inline: 0.65rem;
+      padding-block: 0.3rem;
+      border: none;
+      background: transparent;
+    }
+
+    .btn-icon:hover { background-color: #f3f4f6; }
+
+    .small-muted {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .table-responsive {
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .tag-pill {
+      border-radius: 999px;
+      padding: 0.15rem 0.6rem;
+      background: #f3f4f6;
+      font-size: 0.75rem;
+      color: #4b5563;
+    }
+
+    .footer-text {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .nav-link { font-size: 0.9rem; }
+    .nav-link.active { font-weight: 600; }
+
+    .app-section { display: none; }
+    .app-section.active { display: block; }
+
+    /* Auth overlay */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #eef2ff 0, #0f172a 90%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 24px;
+      padding: 1.8rem 1.8rem 1.4rem;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(12px);
+    }
+
+    .auth-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: #eff4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.6rem;
+    }
+
+    .auth-title { font-weight: 600; margin-bottom: 0.2rem; }
+
+    .auth-tabs button {
+      border-radius: 999px;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.7rem;
+    }
+
+    .auth-tabs button.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* Dashboard task cards */
+    #dashboardCards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .dash-task-card {
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      padding: 0.7rem 0.9rem;
+      min-width: 230px;
+      max-width: 260px;
+      background: #ffffff;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+    }
+
+    .dash-task-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .dash-task-card.done {
+      background: #ecfdf3;
+      border-color: #bbf7d0;
+    }
+
+    .dash-task-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.15rem;
+    }
+
+    .dash-task-card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      max-width: 150px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .dash-task-card-topic {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-height: 34px;
+      overflow: hidden;
+    }
+
+    .dash-task-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.25rem;
+      font-size: 0.75rem;
+    }
+
+    .dash-task-badge-time {
+      border-radius: 999px;
+      padding: 0.05rem 0.55rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 500;
+    }
+
+    .dash-task-pill {
+      border-radius: 999px;
+      padding: 0.05rem 0.55rem;
+      background: #f3f4f6;
+      color: #4b5563;
+      font-size: 0.72rem;
+    }
+
+    @media (max-width: 767.98px) {
+      .app-wrapper { padding-top: 4.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Auth Overlay (First-time + Login) -->
+  <div id="authOverlay">
+    <div class="auth-card">
+      <div class="auth-logo">T</div>
+      <h5 class="auth-title" id="authTitle">Welcome to Time Traker</h5>
+      <p class="small-muted mb-3" id="authSubtitle">
+        Create your profile once. Your data stays in this browser only.
+      </p>
+
+      <div class="auth-tabs mb-3 d-flex gap-2">
+        <button id="tabRegister" type="button" class="btn btn-outline-secondary btn-sm active">
+          First time
+        </button>
+        <button id="tabLogin" type="button" class="btn btn-outline-secondary btn-sm">
+          Returning
+        </button>
+      </div>
+
+      <!-- Register form -->
+      <form id="registerForm" class="row g-2">
+        <div class="col-12">
+          <label class="form-label">Your name</label>
+          <input type="text" class="form-control" id="regName" placeholder="e.g. Mani" required />
+        </div>
+        <div class="col-12">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-control" id="regUsername" placeholder="e.g. mani123" required />
+        </div>
+        <div class="col-12">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="regPassword" placeholder="Choose a password" required />
+        </div>
+        <div class="col-12 d-flex justify-content-between align-items-center mt-2">
+          <span class="small-muted">Not a secure account. For local tracking only.</span>
+          <button type="submit" class="btn btn-primary-soft btn-pill">Save & Enter</button>
+        </div>
+      </form>
+
+      <!-- Login form -->
+      <form id="loginForm" class="row g-2" style="display:none;">
+        <div class="col-12">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-control" id="loginUsername" required />
+        </div>
+        <div class="col-12">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="loginPassword" required />
+        </div>
+        <div class="col-12 d-flex justify-content-between align-items-center mt-2">
+          <button type="button" class="btn btn-outline-secondary btn-sm btn-pill" id="resetProfileBtn">
+            Reset profile
+          </button>
+          <button type="submit" class="btn btn-primary-soft btn-pill">Login</button>
+        </div>
+        <div class="col-12">
+          <p class="small-muted mt-2 mb-0" id="loginError" style="display:none; color:#b91c1c;">
+            Invalid username or password. Try again.
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top">
+    <div class="container-fluid" style="max-width: 1200px;">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="javascript:void(0);" data-section="dashboard">
+        <span
+          class="d-inline-flex align-items-center justify-content-center rounded-circle"
+          style="width: 32px; height: 32px; background: #eff4ff; color: var(--primary); font-weight: 700;"
+        >
+          T
+        </span>
+        <span>Time Traker</span>
+      </a>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#mainNavbar"
+        aria-controls="mainNavbar"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="navLinks">
+          <li class="nav-item">
+            <a class="nav-link active" href="javascript:void(0);" data-section="dashboard">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="javascript:void(0);" data-section="todo">To-Do</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="javascript:void(0);" data-section="history">History</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="javascript:void(0);" data-section="about">About</a>
+          </li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-3 small text-muted">
+          <span id="todayLabel"></span>
+          <span id="welcomeUser" class="d-none d-sm-inline small-muted"></span>
+
+          <!-- Add Task (+) -->
+          <button
+            class="btn btn-primary-soft btn-sm btn-pill"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#addTaskModal"
+          >
+            + Add Task
+          </button>
+
+          <!-- Export dropdown -->
+          <div class="dropdown">
+            <button
+              class="btn btn-outline-secondary btn-sm btn-pill dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Export
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><button class="dropdown-item" id="exportCsvBtn">Export CSV</button></li>
+              <li><button class="dropdown-item" id="exportJsonBtn">Export JSON</button></li>
+              <li><button class="dropdown-item" id="exportPdfBtn">Export Dashboard PDF</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Add Task Modal -->
+  <div
+    class="modal fade"
+    id="addTaskModal"
+    tabindex="-1"
+    aria-labelledby="addTaskModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addTaskModalLabel">Add Study Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="taskForm" class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" id="taskDate" required />
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Subject (Skill)</label>
+              <!-- Subject dropdown populated from My Subjects -->
+              <select class="form-select" id="taskSubject" required></select>
+              <div class="small-muted mt-1">
+                Manage subjects in <strong>About → My Subjects</strong>.
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Topic</label>
+              <input
+                type="text"
+                class="form-control"
+                id="taskTopic"
+                placeholder="Pointers, OOP, React hooks..."
+                required
+              />
+            </div>
+            <div class="col-6">
+              <label class="form-label">Planned Time (minutes)</label>
+              <input
+                type="number"
+                min="10"
+                step="5"
+                class="form-control"
+                id="taskDuration"
+                placeholder="e.g. 45"
+                required
+              />
+            </div>
+            <div class="col-6">
+              <label class="form-label">Difficulty</label>
+              <select id="taskDifficulty" class="form-select">
+                <option value="Easy" selected>Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <span class="small-muted">Pick a subject once, then just change topics.</span>
+          <button type="button" class="btn btn-primary-soft btn-pill" id="saveTaskBtn">
+            Save Task
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div class="app-wrapper container-fluid">
+    <!-- Dashboard section -->
+    <section class="app-section active" id="section-dashboard">
+      <!-- Overview -->
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="app-card h-100">
+            <div class="card-header card-header-custom d-flex justify-content-between align-items-center px-4 py-3">
+              <div>
+                <div class="chip mb-1"><span>Dashboard</span></div>
+                <h5 class="mb-0 mt-1">Today & Overall Progress</h5>
+              </div>
+              <span class="small-muted">Daily · Weekly · Monthly</span>
+            </div>
+            <div class="card-body p-4">
+              <div class="d-flex flex-wrap gap-3 mb-3">
+                <div>
+                  <div class="stat-value" id="statTasksToday">0</div>
+                  <div class="stat-label">Tasks planned (selected date)</div>
+                </div>
+                <div>
+                  <div class="stat-value" id="statCompletedToday">0</div>
+                  <div class="stat-label">Tasks completed</div>
+                </div>
+                <div>
+                  <div class="stat-value" id="statMinutesToday">0</div>
+                  <div class="stat-label">Minutes planned</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="small-muted">Filter by date</span>
+                <input type="date" id="filterDate" class="form-control form-control-sm" style="max-width: 170px;" />
+              </div>
+
+              <div class="progress mb-2" style="height: 8px;">
+                <div
+                  class="progress-bar"
+                  id="progressBarToday"
+                  role="progressbar"
+                  style="width: 0%;"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+              <div class="small-muted d-flex justify-content-between mb-2">
+                <span id="progressTextToday">0% completed</span>
+                <span id="filterSummaryText">Showing: Today</span>
+              </div>
+
+              <div class="mt-2 small-muted" id="weekMonthSummary">
+                Weekly / monthly stats will appear after you add tasks.
+              </div>
+
+              <!-- Card view of tasks for selected date -->
+              <hr class="my-3" />
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small-muted">Tasks for selected date (interactive cards)</span>
+                <span class="small-muted" id="dashboardCardsCount">0 tasks</span>
+              </div>
+              <div id="dashboardCards">
+                <!-- Cards injected here -->
+              </div>
+              <div class="small-muted mt-1">
+                Tip: Click a card to toggle <strong>Done/Pending</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts: Weekly + Completion -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+          <div class="app-card">
+            <div class="card-header card-header-custom d-flex justify-content-between align-items-center px-4 py-3">
+              <div>
+                <h6 class="mb-0">Last 7 Days Study Time</h6>
+                <p class="small-muted mb-0">Total planned minutes per day.</p>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <canvas id="weeklyChart" height="120"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="app-card">
+            <div class="card-header card-header-custom d-flex justify-content-between align-items-center px-4 py-3">
+              <div>
+                <h6 class="mb-0">Completion Breakdown</h6>
+                <p class="small-muted mb-0">Completed vs pending (selected date).</p>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <canvas id="completionChart" height="180"></canvas>
+              <div class="mt-3 small-muted" id="completionSummary">
+                No tasks yet. Add your first task to see progress.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts: Monthly + Skills -->
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="app-card">
+            <div class="card-header card-header-custom d-flex justify-content-between align-items-center px-4 py-3">
+              <div>
+                <h6 class="mb-0">Last 30 Days (Monthly)</h6>
+                <p class="small-muted mb-0">Daily planned minutes for the last 30 days.</p>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <canvas id="monthlyChart" height="120"></canvas>
+              <div class="mt-3 small-muted" id="monthlySummary">
+                Monthly summary will appear when you add tasks.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="app-card">
+            <div class="card-header card-header-custom d-flex justify-content-between align-items-center px-4 py-3">
+              <div>
+                <h6 class="mb-0">Skills Dashboard</h6>
+                <p class="small-muted mb-0">Skill-wise study time (Subject field).</p>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <canvas id="skillsChart" height="160"></canvas>
+              <div class="mt-3 small-muted" id="skillsSummary">
+                No skills yet. Add tasks with subjects like “C”, “Python”, “HTML”, etc.
+              </div>
+              <ul class="mt-2 small-muted list-unstyled" id="skillsList"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- To-Do section -->
+    <section class="app-section" id="section-todo">
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="app-card">
+            <div class="card-header card-header-custom d-flex justify-content-between align-items-center px-4 py-3">
+              <div>
+                <h6 class="mb-0">Study To-Do List</h6>
+                <p class="small-muted mb-0">
+                  All topics and tasks. Use the + Add Task button to add items.
+                </p>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="tag-pill" id="totalTasksLabel">Total tasks: 0</span>
+                <button id="clearAllBtn" class="btn btn-outline-secondary btn-sm btn-pill">
+                  Clear All
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 40px;"></th>
+                      <th>Date</th>
+                      <th>Subject (Skill) &amp; Topic</th>
+                      <th class="text-center">Minutes</th>
+                      <th class="text-center">Difficulty</th>
+                      <th class="text-center">Status</th>
+                      <th class="text-end" style="width: 70px;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="taskTableBody">
+                    <!-- Tasks injected -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-4 py-2 small-muted">
+                Data is stored locally in your browser (<code>localStorage</code>). It stays on this device.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- History section -->
+    <section class="app-section" id="section-history">
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="app-card">
+            <div class="card-header card-header-custom d-flex justify-content-between align-items-center px-4 py-3">
+              <div>
+                <h6 class="mb-0">History & Logs</h6>
+                <p class="small-muted mb-0">
+                  All past tasks with quick time-range filters.
+                </p>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="small-muted">Range</span>
+                <select id="historyRange" class="form-select form-select-sm" style="max-width: 160px;">
+                  <option value="all" selected>All time</option>
+                  <option value="7">Last 7 days</option>
+                  <option value="30">Last 30 days</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Date</th>
+                      <th>Subject</th>
+                      <th>Topic</th>
+                      <th class="text-center">Minutes</th>
+                      <th class="text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyTableBody">
+                    <!-- History rows -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-4 py-2 small-muted">
+                Read-only history view. To edit or delete tasks, use the To-Do section.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About + My Subjects section -->
+    <section class="app-section" id="section-about">
+      <div class="row g-4 mb-4">
+        <div class="col-12">
+          <div class="app-card">
+            <div class="card-header card-header-custom px-4 py-3">
+              <div>
+                <div class="chip mb-1"><span>About Time Traker</span></div>
+                <h6 class="mb-0">Your personal time & study dashboard</h6>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <p class="small-muted mb-2">
+                Time Traker helps you:
+              </p>
+              <ul class="small-muted mb-3">
+                <li>Plan your daily study or work tasks with clear topics.</li>
+                <li>Track time spent on each skill (C, C++, HTML, CSS, JS, Python, Linux, AI, etc.).</li>
+                <li>See weekly and monthly trends with visual charts.</li>
+                <li>Review a full history of what you studied and when.</li>
+                <li>Export your data as CSV, JSON, or PDF.</li>
+              </ul>
+              <p class="small-muted mb-3">
+                All data is stored locally in this browser using <code>localStorage</code>.
+                It is not synced to any server and is only for personal tracking.
+              </p>
+
+              <hr />
+
+              <!-- My Subjects Manager -->
+              <h6 class="mb-2">My Subjects (Skills)</h6>
+              <p class="small-muted mb-2">
+                Add your subjects one time. Then choose them from the dropdown when adding tasks.
+              </p>
+
+              <div class="row g-2 mb-3">
+                <div class="col-md-6 col-12">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="newSubjectInput"
+                    placeholder="e.g. C, Python, HTML, AI..."
+                  />
+                </div>
+                <div class="col-md-3 col-6">
+                  <button class="btn btn-primary-soft btn-pill w-100" id="addSubjectBtn">
+                    + Add Subject
+                  </button>
+                </div>
+              </div>
+
+              <div id="subjectsEmptyMessage" class="small-muted mb-2">
+                No subjects yet. Add one above (for example: C, C++, HTML, CSS, JS, Python, Linux, AI).
+              </div>
+              <div id="subjectsList" class="d-flex flex-wrap gap-2 mb-4">
+                <!-- Subject chips added here -->
+              </div>
+
+              <hr />
+              <h6 class="mb-1">Developer</h6>
+              <p class="small-muted mb-2">
+                <strong>Karuppasamy M</strong><br />
+                Fullstack Developer · AI Developer · Student of SIT
+              </p>
+              <p class="small-muted mb-0">
+                This project was built as a personal productivity tool to track learning and skill
+                improvement over time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="mt-4 text-center footer-text">
+      Time Traker · Personal Study & Time Tracker · Built with Bootstrap & Chart.js
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- App Script -->
+  <script>
+    const STORAGE_KEY = "timeTrakerTasks_v1";
+    const USER_KEY = "timeTrakerUser";
+    const SUBJECTS_KEY = "timeTrakerSubjects_v1";
+
+    function todayISO() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function loadTasks() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveTasks(tasks) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function loadSubjects() {
+      const defaultSubjects = ["C", "C++", "HTML", "CSS", "JavaScript", "Python", "Linux", "AI"];
+      try {
+        const raw = localStorage.getItem(SUBJECTS_KEY);
+        if (!raw) return defaultSubjects;
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length) return arr;
+        return defaultSubjects;
+      } catch {
+        return defaultSubjects;
+      }
+    }
+
+    function saveSubjects(subjects) {
+      localStorage.setItem(SUBJECTS_KEY, JSON.stringify(subjects));
+    }
+
+    function getUser() {
+      try {
+        const raw = localStorage.getItem(USER_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function saveUser(user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
+
+    function clearUserAndData() {
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(SUBJECTS_KEY);
+    }
+
+    function formatDateLabel(iso) {
+      const d = new Date(iso + "T00:00:00");
+      return d.toLocaleDateString(undefined, { day: "2-digit", month: "short" });
+    }
+
+    function addDays(date, diff) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + diff);
+      return d;
+    }
+
+    let tasks = loadTasks();
+    let subjects = loadSubjects();
+    let lastSelectedSubject = null;
+
+    // Merge subjects from existing tasks (for old data)
+    const fromTasks = [...new Set(tasks.map(t => t.subject).filter(Boolean))];
+    fromTasks.forEach(s => {
+      if (!subjects.includes(s)) subjects.push(s);
+    });
+    saveSubjects(subjects);
+
+    let weeklyChart = null;
+    let completionChart = null;
+    let monthlyChart = null;
+    let skillsChart = null;
+
+    // DOM
+    const todayLabelEl = document.getElementById("todayLabel");
+    const welcomeUserEl = document.getElementById("welcomeUser");
+    const taskDateEl = document.getElementById("taskDate");
+    const filterDateEl = document.getElementById("filterDate");
+    const taskFormEl = document.getElementById("taskForm");
+    const saveTaskBtnEl = document.getElementById("saveTaskBtn");
+    const taskTableBodyEl = document.getElementById("taskTableBody");
+    const clearAllBtnEl = document.getElementById("clearAllBtn");
+    const taskSubjectSelectEl = document.getElementById("taskSubject");
+
+    const statTasksTodayEl = document.getElementById("statTasksToday");
+    const statCompletedTodayEl = document.getElementById("statCompletedToday");
+    const statMinutesTodayEl = document.getElementById("statMinutesToday");
+    const progressBarTodayEl = document.getElementById("progressBarToday");
+    const progressTextTodayEl = document.getElementById("progressTextToday");
+    const filterSummaryTextEl = document.getElementById("filterSummaryText");
+    const totalTasksLabelEl = document.getElementById("totalTasksLabel");
+    const completionSummaryEl = document.getElementById("completionSummary");
+    const weeklyMonthSummaryEl = document.getElementById("weekMonthSummary");
+    const monthlySummaryEl = document.getElementById("monthlySummary");
+    const skillsSummaryEl = document.getElementById("skillsSummary");
+    const skillsListEl = document.getElementById("skillsList");
+
+    const exportCsvBtnEl = document.getElementById("exportCsvBtn");
+    const exportJsonBtnEl = document.getElementById("exportJsonBtn");
+    const exportPdfBtnEl = document.getElementById("exportPdfBtn");
+
+    const historyRangeEl = document.getElementById("historyRange");
+    const historyTableBodyEl = document.getElementById("historyTableBody");
+
+    const addTaskModalEl = document.getElementById("addTaskModal");
+    const addTaskModal = addTaskModalEl ? new bootstrap.Modal(addTaskModalEl) : null;
+
+    const authOverlayEl = document.getElementById("authOverlay");
+    const tabRegisterEl = document.getElementById("tabRegister");
+    const tabLoginEl = document.getElementById("tabLogin");
+    const registerFormEl = document.getElementById("registerForm");
+    const loginFormEl = document.getElementById("loginForm");
+    const authTitleEl = document.getElementById("authTitle");
+    const authSubtitleEl = document.getElementById("authSubtitle");
+    const loginErrorEl = document.getElementById("loginError");
+    const resetProfileBtnEl = document.getElementById("resetProfileBtn");
+    const navLinksEl = document.getElementById("navLinks");
+
+    const dashboardCardsEl = document.getElementById("dashboardCards");
+    const dashboardCardsCountEl = document.getElementById("dashboardCardsCount");
+
+    const newSubjectInputEl = document.getElementById("newSubjectInput");
+    const addSubjectBtnEl = document.getElementById("addSubjectBtn");
+    const subjectsListEl = document.getElementById("subjectsList");
+    const subjectsEmptyMessageEl = document.getElementById("subjectsEmptyMessage");
+
+    function setWelcomeName(name) {
+      if (!name) {
+        welcomeUserEl.classList.add("d-none");
+        welcomeUserEl.textContent = "";
+      } else {
+        welcomeUserEl.classList.remove("d-none");
+        welcomeUserEl.textContent = `Hi, ${name}`;
+      }
+    }
+
+    function switchAuthMode(mode) {
+      const hasUser = !!getUser();
+      if (mode === "register") {
+        tabRegisterEl.classList.add("active");
+        tabLoginEl.classList.remove("active");
+        registerFormEl.style.display = "block";
+        loginFormEl.style.display = "none";
+        loginErrorEl.style.display = "none";
+        authTitleEl.textContent = "Welcome to Time Traker";
+        authSubtitleEl.textContent = "Create your profile once. Your data stays in this browser.";
+      } else {
+        tabRegisterEl.classList.remove("active");
+        tabLoginEl.classList.add("active");
+        registerFormEl.style.display = "none";
+        loginFormEl.style.display = "block";
+        authTitleEl.textContent = "Welcome back";
+        authSubtitleEl.textContent = hasUser
+          ? "Log in with your saved Time Traker profile."
+          : "No profile found. Please create one first.";
+      }
+    }
+
+    function initAuthOverlay() {
+      const user = getUser();
+      if (!user) {
+        switchAuthMode("register");
+      } else {
+        switchAuthMode("login");
+        document.getElementById("loginUsername").value = user.username || "";
+      }
+    }
+
+    function hideAuthOverlay() {
+      authOverlayEl.style.display = "none";
+    }
+
+    function initDates() {
+      const today = todayISO();
+      if (taskDateEl) taskDateEl.value = today;
+      if (filterDateEl) filterDateEl.value = today;
+
+      const d = new Date();
+      todayLabelEl.textContent = d.toLocaleDateString(undefined, {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+      });
+    }
+
+    function renderSubjectDropdown() {
+      if (!taskSubjectSelectEl) return;
+      taskSubjectSelectEl.innerHTML = "";
+      if (!subjects.length) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "No subjects. Add in About → My Subjects";
+        taskSubjectSelectEl.appendChild(opt);
+        taskSubjectSelectEl.disabled = true;
+        return;
+      }
+      taskSubjectSelectEl.disabled = false;
+      subjects.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s;
+        taskSubjectSelectEl.appendChild(opt);
+      });
+      if (lastSelectedSubject && subjects.includes(lastSelectedSubject)) {
+        taskSubjectSelectEl.value = lastSelectedSubject;
+      }
+    }
+
+    function renderSubjectsManager() {
+      subjectsListEl.innerHTML = "";
+      if (!subjects.length) {
+        subjectsEmptyMessageEl.style.display = "block";
+        return;
+      }
+      subjectsEmptyMessageEl.style.display = "none";
+
+      subjects.forEach(subj => {
+        const chip = document.createElement("div");
+        chip.className = "d-inline-flex align-items-center gap-1 tag-pill";
+        chip.innerHTML = `
+          <span>${subj}</span>
+          <button type="button" class="btn-icon p-0 ms-1 subject-delete-btn" data-subject="${subj}" title="Remove subject">
+            ×
+          </button>
+        `;
+        subjectsListEl.appendChild(chip);
+      });
+    }
+
+    function renderTaskTable() {
+      const filterDate = filterDateEl.value || todayISO();
+      const rows = [];
+
+      tasks
+        .sort((a, b) => {
+          if (a.date === b.date) return a.createdAt - b.createdAt;
+          return a.date.localeCompare(b.date);
+        })
+        .forEach((t) => {
+          const isFilteredDate = t.date === filterDate;
+          const tr = document.createElement("tr");
+          tr.dataset.id = t.id;
+
+          tr.innerHTML = `
+            <td class="text-center">
+              <input type="checkbox" class="form-check-input task-done-toggle" ${
+                t.status === "done" ? "checked" : ""
+              } />
+            </td>
+            <td><span class="small-muted">${formatDateLabel(t.date)}</span></td>
+            <td>
+              <div class="fw-semibold">${t.subject}</div>
+              <div class="small-muted text-truncate" style="max-width: 260px;">
+                ${t.topic}
+              </div>
+            </td>
+            <td class="text-center"><span class="tag-pill">${t.duration} min</span></td>
+            <td class="text-center"><span class="tag-pill">${t.difficulty}</span></td>
+            <td class="text-center">
+              <span class="badge-status ${t.status === "done" ? "done" : "pending"}">
+                ${t.status === "done" ? "Done" : "Pending"}
+              </span>
+            </td>
+            <td class="text-end">
+              <button class="btn-icon delete-task-btn" title="Delete task">✕</button>
+            </td>
+          `;
+
+          if (isFilteredDate) tr.style.backgroundColor = "#fafafa";
+          rows.push(tr);
+        });
+
+      taskTableBodyEl.innerHTML = "";
+      if (!rows.length) {
+        const emptyRow = document.createElement("tr");
+        emptyRow.innerHTML = `
+          <td colspan="7" class="text-center small-muted py-3">
+            No tasks yet. Use the "+ Add Task" button to add your first task.
+          </td>
+        `;
+        taskTableBodyEl.appendChild(emptyRow);
+      } else {
+        rows.forEach((r) => taskTableBodyEl.appendChild(r));
+      }
+
+      totalTasksLabelEl.textContent = `Total tasks: ${tasks.length}`;
+    }
+
+    function renderHistoryTable() {
+      const range = historyRangeEl ? historyRangeEl.value : "all";
+      let filtered = tasks.slice();
+
+      if (range !== "all") {
+        const days = parseInt(range, 10);
+        const today = new Date();
+        const threshold = addDays(today, -(days - 1));
+        filtered = tasks.filter((t) => {
+          const d = new Date(t.date + "T00:00:00");
+          return d >= threshold;
+        });
+      }
+
+      filtered.sort((a, b) => {
+        if (a.date === b.date) return b.createdAt - a.createdAt;
+        return b.date.localeCompare(a.date);
+      });
+
+      historyTableBodyEl.innerHTML = "";
+      if (!filtered.length) {
+        const emptyRow = document.createElement("tr");
+        emptyRow.innerHTML = `
+          <td colspan="5" class="text-center small-muted py-3">
+            No history in this range. Try a different range or add more tasks.
+          </td>
+        `;
+        historyTableBodyEl.appendChild(emptyRow);
+        return;
+      }
+
+      filtered.forEach((t) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="small-muted">${formatDateLabel(t.date)}</span></td>
+          <td>${t.subject}</td>
+          <td>
+            <span class="small-muted text-truncate" style="max-width: 260px; display:inline-block;">
+              ${t.topic}
+            </span>
+          </td>
+          <td class="text-center">${t.duration} min</td>
+          <td class="text-center">
+            <span class="badge-status ${t.status === "done" ? "done" : "pending"}">
+              ${t.status === "done" ? "Done" : "Pending"}
+            </span>
+          </td>
+        `;
+        historyTableBodyEl.appendChild(tr);
+      });
+    }
+
+    function renderDashboardCards() {
+      const filterDate = filterDateEl.value || todayISO();
+      const tasksToday = tasks.filter((t) => t.date === filterDate);
+
+      dashboardCardsEl.innerHTML = "";
+      dashboardCardsCountEl.textContent = `${tasksToday.length} task${tasksToday.length === 1 ? "" : "s"}`;
+
+      if (!tasksToday.length) {
+        const span = document.createElement("span");
+        span.className = "small-muted";
+        span.textContent = "No tasks for this date. Add one to see cards here.";
+        dashboardCardsEl.appendChild(span);
+        return;
+      }
+
+      tasksToday
+        .sort((a, b) => a.createdAt - b.createdAt)
+        .forEach((t) => {
+          const card = document.createElement("div");
+          card.className = "dash-task-card" + (t.status === "done" ? " done" : "");
+          card.dataset.id = t.id;
+
+          card.innerHTML = `
+            <div class="dash-task-card-header">
+              <div class="dash-task-card-title" title="${t.subject}">${t.subject}</div>
+              <span class="badge-status ${t.status === "done" ? "done" : "pending"}">
+                ${t.status === "done" ? "Done" : "Pending"}
+              </span>
+            </div>
+            <div class="dash-task-card-topic" title="${t.topic}">
+              ${t.topic}
+            </div>
+            <div class="dash-task-card-footer">
+              <span class="dash-task-badge-time">${t.duration} min</span>
+              <span class="dash-task-pill">${t.difficulty}</span>
+            </div>
+          `;
+
+          card.addEventListener("click", () => {
+            tasks = tasks.map((task) =>
+              task.id === t.id
+                ? { ...task, status: task.status === "done" ? "pending" : "done" }
+                : task
+            );
+            saveTasks(tasks);
+            refreshUI();
+          });
+
+          dashboardCardsEl.appendChild(card);
+        });
+    }
+
+    function updateTodayStats() {
+      const filterDate = filterDateEl.value || todayISO();
+      const tasksToday = tasks.filter((t) => t.date === filterDate);
+      const completedToday = tasksToday.filter((t) => t.status === "done");
+
+      const totalMinutes = tasksToday.reduce((sum, t) => sum + (t.duration || 0), 0);
+      const totalTasks = tasksToday.length;
+      const doneCount = completedToday.length;
+      const percentage = totalTasks ? Math.round((doneCount / totalTasks) * 100) : 0;
+
+      statTasksTodayEl.textContent = totalTasks;
+      statCompletedTodayEl.textContent = doneCount;
+      statMinutesTodayEl.textContent = totalMinutes;
+
+      progressBarTodayEl.style.width = percentage + "%";
+      progressBarTodayEl.setAttribute("aria-valuenow", percentage);
+      progressTextTodayEl.textContent = `${percentage}% completed`;
+
+      const isToday = filterDate === todayISO();
+      filterSummaryTextEl.textContent = `Showing: ${isToday ? "Today" : filterDate}`;
+    }
+
+    function updateWeeklyChart() {
+      const days = [];
+      const minutesPerDay = [];
+      const today = new Date();
+
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        const iso = `${yyyy}-${mm}-${dd}`;
+        days.push(formatDateLabel(iso));
+
+        const totalMinutes = tasks
+          .filter((t) => t.date === iso)
+          .reduce((sum, t) => sum + (t.duration || 0), 0);
+        minutesPerDay.push(totalMinutes);
+      }
+
+      const ctx = document.getElementById("weeklyChart").getContext("2d");
+      if (weeklyChart) weeklyChart.destroy();
+
+      weeklyChart = new Chart(ctx, {
+        type: "bar",
+        data: { labels: days, datasets: [{ label: "Minutes", data: minutesPerDay }] },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { font: { size: 11 } } },
+            y: { beginAtZero: true, ticks: { stepSize: 30 } },
+          },
+        },
+      });
+
+      const weekTotal = minutesPerDay.reduce((a, b) => a + b, 0);
+      weeklyMonthSummaryEl.textContent = `Last 7 days: ${weekTotal} minutes planned in total.`;
+    }
+
+    function updateCompletionChart() {
+      const filterDate = filterDateEl.value || todayISO();
+      const tasksToday = tasks.filter((t) => t.date === filterDate);
+      const doneCount = tasksToday.filter((t) => t.status === "done").length;
+      const pendingCount = tasksToday.length - doneCount;
+
+      const ctx = document.getElementById("completionChart").getContext("2d");
+      if (completionChart) completionChart.destroy();
+
+      if (!tasksToday.length) {
+        completionSummaryEl.textContent =
+          "No tasks for this date. Add a task to track your progress.";
+        completionChart = new Chart(ctx, {
+          type: "doughnut",
+          data: { labels: ["No data"], datasets: [{ data: [1] }] },
+          options: { plugins: { legend: { display: false } } },
+        });
+        return;
+      }
+
+      completionChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Completed", "Pending"],
+          datasets: [{ data: [doneCount, pendingCount] }],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { boxWidth: 10, font: { size: 11 } },
+            },
+          },
+        },
+      });
+
+      const percent = Math.round((doneCount / tasksToday.length) * 100);
+      completionSummaryEl.textContent = `For ${
+        filterDate === todayISO() ? "today" : filterDate
+      }: ${doneCount} / ${tasksToday.length} tasks completed (${percent}%).`;
+    }
+
+    function updateMonthlyChart() {
+      const days = [];
+      const minutesPerDay = [];
+      const today = new Date();
+
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        const iso = `${yyyy}-${mm}-${dd}`;
+        days.push(formatDateLabel(iso));
+
+        const totalMinutes = tasks
+          .filter((t) => t.date === iso)
+          .reduce((sum, t) => sum + (t.duration || 0), 0);
+        minutesPerDay.push(totalMinutes);
+      }
+
+      const ctx = document.getElementById("monthlyChart").getContext("2d");
+      if (monthlyChart) monthlyChart.destroy();
+
+      monthlyChart = new Chart(ctx, {
+        type: "line",
+        data: { labels: days, datasets: [{ label: "Minutes", data: minutesPerDay, tension: 0.3 }] },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { font: { size: 10 } } },
+            y: { beginAtZero: true, ticks: { stepSize: 30 } },
+          },
+        },
+      });
+
+      const monthTotal = minutesPerDay.reduce((a, b) => a + b, 0);
+      monthlySummaryEl.textContent = `Last 30 days: ${monthTotal} total planned study minutes.`;
+    }
+
+    function updateSkillsDashboard() {
+      const subjectTotals = {};
+      tasks.forEach((t) => {
+        if (!t.subject) return;
+        if (!subjectTotals[t.subject]) subjectTotals[t.subject] = { minutes: 0, tasks: 0 };
+        subjectTotals[t.subject].minutes += t.duration || 0;
+        subjectTotals[t.subject].tasks += 1;
+      });
+
+      const subjectsKeys = Object.keys(subjectTotals);
+      const ctx = document.getElementById("skillsChart").getContext("2d");
+      if (skillsChart) skillsChart.destroy();
+
+      if (!subjectsKeys.length) {
+        skillsSummaryEl.textContent =
+          "No skills yet. Add tasks with subjects like “C”, “Python”, “HTML”, etc.";
+        skillsListEl.innerHTML = "";
+        skillsChart = new Chart(ctx, {
+          type: "doughnut",
+          data: { labels: ["No data"], datasets: [{ data: [1] }] },
+          options: { plugins: { legend: { display: false } } },
+        });
+        return;
+      }
+
+      const sorted = subjectsKeys.sort(
+        (a, b) => subjectTotals[b].minutes - subjectTotals[a].minutes
+      );
+      const top = sorted.slice(0, 6);
+      const labels = top;
+      const data = top.map((s) => subjectTotals[s].minutes);
+
+      skillsChart = new Chart(ctx, {
+        type: "bar",
+        data: { labels, datasets: [{ data }] },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true } },
+        },
+      });
+
+      const topSkill = top[0];
+      const totalSkills = subjectsKeys.length;
+      skillsSummaryEl.textContent = `You are tracking ${totalSkills} skills. Top skill: ${topSkill} with ${subjectTotals[topSkill].minutes} planned minutes.`;
+
+      skillsListEl.innerHTML = "";
+      sorted.forEach((s) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="fw-semibold">${s}</span> – ${subjectTotals[s].minutes} min, ${subjectTotals[s].tasks} tasks`;
+        skillsListEl.appendChild(li);
+      });
+    }
+
+    function refreshUI() {
+      renderSubjectDropdown();
+      renderSubjectsManager();
+      renderTaskTable();
+      renderHistoryTable();
+      updateTodayStats();
+      updateWeeklyChart();
+      updateCompletionChart();
+      updateMonthlyChart();
+      updateSkillsDashboard();
+      renderDashboardCards();
+    }
+
+    function exportTasksAsCSV() {
+      if (!tasks.length) {
+        alert("No data to export.");
+        return;
+      }
+
+      const header = [
+        "id",
+        "date",
+        "subject",
+        "topic",
+        "duration",
+        "difficulty",
+        "status",
+        "createdAt",
+      ];
+      const rows = tasks.map((t) => [
+        t.id,
+        t.date,
+        t.subject,
+        t.topic,
+        t.duration,
+        t.difficulty,
+        t.status,
+        t.createdAt,
+      ]);
+
+      function csvEscape(v) {
+        if (v === null || v === undefined) return "";
+        const s = String(v);
+        if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+        return s;
+      }
+
+      let csv = header.join(",") + "\n";
+      rows.forEach((row) => {
+        csv += row.map(csvEscape).join(",") + "\n";
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "time_traker_tasks.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportTasksAsJSON() {
+      if (!tasks.length) {
+        alert("No data to export.");
+        return;
+      }
+      const json = JSON.stringify(tasks, null, 2);
+      const blob = new Blob([json], { type: "application/json;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "time_traker_tasks.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportDashboardAsPDF() {
+      const hasJsPDF = window.jspdf && (window.jspdf.jsPDF || window.jsPDF);
+      if (!hasJsPDF) {
+        alert("PDF library not loaded.");
+        return;
+      }
+      if (!tasks.length) {
+        alert("No data to export in PDF.");
+        return;
+      }
+
+      const jsPDFCtor = window.jspdf.jsPDF || window.jsPDF;
+      const doc = new jsPDFCtor("p", "mm", "a4");
+
+      const user = getUser();
+      const marginLeft = 14;
+      let cursorY = 18;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text("Time Traker - Dashboard Report", marginLeft, cursorY);
+      cursorY += 7;
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      const now = new Date();
+      const dateStr = now.toLocaleString();
+      doc.text(`Generated: ${dateStr}`, marginLeft, cursorY);
+      cursorY += 6;
+
+      if (user && user.name) {
+        doc.text(`User: ${user.name}`, marginLeft, cursorY);
+        cursorY += 6;
+      }
+
+      const filterDate = filterDateEl.value || todayISO();
+      doc.text(`Selected date: ${filterDate}`, marginLeft, cursorY);
+      cursorY += 4;
+
+      doc.setDrawColor(200);
+      doc.line(marginLeft, cursorY, 200, cursorY);
+      cursorY += 6;
+
+      // Summary stats
+      const filterDateTasks = tasks.filter((t) => t.date === filterDate);
+      const completed = filterDateTasks.filter((t) => t.status === "done");
+      const totalMinutes = filterDateTasks.reduce((s, t) => s + (t.duration || 0), 0);
+      const percentage = filterDateTasks.length
+        ? Math.round((completed.length / filterDateTasks.length) * 100)
+        : 0;
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Summary (selected date)", marginLeft, cursorY);
+      cursorY += 6;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(`Tasks planned: ${filterDateTasks.length}`, marginLeft, cursorY);
+      cursorY += 5;
+      doc.text(`Tasks completed: ${completed.length}`, marginLeft, cursorY);
+      cursorY += 5;
+      doc.text(`Minutes planned: ${totalMinutes}`, marginLeft, cursorY);
+      cursorY += 5;
+      doc.text(`Completion: ${percentage}%`, marginLeft, cursorY);
+      cursorY += 8;
+
+      // Table of all tasks
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text("All tasks (full list)", marginLeft, cursorY);
+      cursorY += 3;
+
+      const tableColumns = [
+        { header: "Date", dataKey: "date" },
+        { header: "Subject", dataKey: "subject" },
+        { header: "Topic", dataKey: "topic" },
+        { header: "Min", dataKey: "duration" },
+        { header: "Diff", dataKey: "difficulty" },
+        { header: "Status", dataKey: "status" },
+      ];
+
+      const tableRows = tasks.map((t) => ({
+        date: t.date,
+        subject: t.subject,
+        topic: t.topic,
+        duration: t.duration,
+        difficulty: t.difficulty,
+        status: t.status,
+      }));
+
+      doc.autoTable({
+        startY: cursorY + 2,
+        head: [tableColumns.map((c) => c.header)],
+        body: tableRows.map((row) => tableColumns.map((c) => row[c.dataKey])),
+        styles: { fontSize: 8, cellPadding: 1.2 },
+        headStyles: { fillColor: [37, 99, 235], textColor: 255 },
+        columnStyles: {
+          0: { cellWidth: 20 },
+          1: { cellWidth: 28 },
+          2: { cellWidth: 80 },
+        },
+      });
+
+      doc.save("time_traker_dashboard.pdf");
+    }
+
+    function handleSaveTask() {
+      const date = taskDateEl.value || todayISO();
+      const subject = (taskSubjectSelectEl.value || "").trim();
+      const topic = document.getElementById("taskTopic").value.trim();
+      const duration = parseInt(document.getElementById("taskDuration").value, 10) || 0;
+      const difficulty = document.getElementById("taskDifficulty").value;
+
+      if (!subject || !topic || duration <= 0) {
+        alert("Please fill all required fields with valid values.");
+        return;
+      }
+
+      const newTask = {
+        id: Date.now().toString(),
+        date,
+        subject,
+        topic,
+        duration,
+        difficulty,
+        status: "pending",
+        createdAt: Date.now(),
+      };
+
+      tasks.push(newTask);
+      saveTasks(tasks);
+
+      lastSelectedSubject = subject;
+
+      document.getElementById("taskTopic").value = "";
+      document.getElementById("taskDuration").value = "";
+      document.getElementById("taskDifficulty").value = "Easy";
+
+      filterDateEl.value = date;
+      if (addTaskModal) addTaskModal.hide();
+
+      refreshUI();
+    }
+
+    function switchSection(section) {
+      const sections = ["dashboard", "todo", "history", "about"];
+      sections.forEach((s) => {
+        const el = document.getElementById("section-" + s);
+        if (el) el.classList.toggle("active", s === section);
+      });
+
+      const links = navLinksEl.querySelectorAll(".nav-link");
+      links.forEach((link) => {
+        const sec = link.dataset.section;
+        link.classList.toggle("active", sec === section);
+      });
+    }
+
+    // Event bindings
+    if (saveTaskBtnEl) saveTaskBtnEl.addEventListener("click", handleSaveTask);
+
+    if (taskFormEl) {
+      taskFormEl.addEventListener("submit", (e) => {
+        e.preventDefault();
+        handleSaveTask();
+      });
+    }
+
+    if (filterDateEl) filterDateEl.addEventListener("change", refreshUI);
+
+    if (historyRangeEl) historyRangeEl.addEventListener("change", renderHistoryTable);
+
+    taskTableBodyEl.addEventListener("click", (e) => {
+      const row = e.target.closest("tr");
+      if (!row) return;
+      const id = row.dataset.id;
+
+      if (e.target.classList.contains("task-done-toggle")) {
+        const checked = e.target.checked;
+        tasks = tasks.map((t) =>
+          t.id === id ? { ...t, status: checked ? "done" : "pending" } : t
+        );
+        saveTasks(tasks);
+        refreshUI();
+        return;
+      }
+
+      if (e.target.classList.contains("delete-task-btn")) {
+        if (confirm("Delete this task?")) {
+          tasks = tasks.filter((t) => t.id !== id);
+          saveTasks(tasks);
+          refreshUI();
+        }
+      }
+    });
+
+    clearAllBtnEl.addEventListener("click", () => {
+      if (!tasks.length) {
+        alert("No tasks to clear.");
+        return;
+      }
+      if (confirm("This will remove all tasks from your tracker. Continue?")) {
+        tasks = [];
+        saveTasks(tasks);
+        refreshUI();
+      }
+    });
+
+    if (exportCsvBtnEl) exportCsvBtnEl.addEventListener("click", exportTasksAsCSV);
+    if (exportJsonBtnEl) exportJsonBtnEl.addEventListener("click", exportTasksAsJSON);
+    if (exportPdfBtnEl) exportPdfBtnEl.addEventListener("click", exportDashboardAsPDF);
+
+    // Subject manager events
+    addSubjectBtnEl.addEventListener("click", () => {
+      const value = (newSubjectInputEl.value || "").trim();
+      if (!value) {
+        alert("Enter a subject name.");
+        return;
+      }
+      if (subjects.includes(value)) {
+        alert("Subject already exists.");
+        return;
+      }
+      subjects.push(value);
+      saveSubjects(subjects);
+      newSubjectInputEl.value = "";
+      renderSubjectDropdown();
+      renderSubjectsManager();
+    });
+
+    subjectsListEl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".subject-delete-btn");
+      if (!btn) return;
+      const subj = btn.dataset.subject;
+      if (!subj) return;
+      if (!confirm(`Remove subject "${subj}"? This will not delete tasks.`)) return;
+      subjects = subjects.filter((s) => s !== subj);
+      saveSubjects(subjects);
+      renderSubjectDropdown();
+      renderSubjectsManager();
+    });
+
+    // Modal: ensure dropdown filled & last subject selected
+    if (addTaskModalEl) {
+      addTaskModalEl.addEventListener("show.bs.modal", () => {
+        renderSubjectDropdown();
+        if (lastSelectedSubject && subjects.includes(lastSelectedSubject)) {
+          taskSubjectSelectEl.value = lastSelectedSubject;
+        } else if (subjects.length) {
+          taskSubjectSelectEl.value = subjects[0];
+        }
+      });
+    }
+
+    // Nav section switching
+    navLinksEl.addEventListener("click", (e) => {
+      const link = e.target.closest(".nav-link");
+      if (!link) return;
+      const section = link.dataset.section;
+      if (section) switchSection(section);
+    });
+
+    // Auth events
+    tabRegisterEl.addEventListener("click", () => switchAuthMode("register"));
+    tabLoginEl.addEventListener("click", () => switchAuthMode("login"));
+
+    registerFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("regName").value.trim();
+      const username = document.getElementById("regUsername").value.trim();
+      const password = document.getElementById("regPassword").value;
+
+      if (!name || !username || !password) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      const user = { name, username, password };
+      saveUser(user);
+      setWelcomeName(name);
+      hideAuthOverlay();
+    });
+
+    loginFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const user = getUser();
+      if (!user) {
+        alert("No profile found. Please create one first.");
+        switchAuthMode("register");
+        return;
+      }
+
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (username === user.username && password === user.password) {
+        loginErrorEl.style.display = "none";
+        setWelcomeName(user.name);
+        hideAuthOverlay();
+      } else {
+        loginErrorEl.style.display = "block";
+      }
+    });
+
+    resetProfileBtnEl.addEventListener("click", () => {
+      if (confirm("This will remove your profile, all tasks, and subjects. Continue?")) {
+        clearUserAndData();
+        tasks = [];
+        subjects = loadSubjects();
+        lastSelectedSubject = null;
+        refreshUI();
+        switchAuthMode("register");
+      }
+    });
+
+    // Initial boot
+    (function init() {
+      initDates();
+      initAuthOverlay();
+
+      const user = getUser();
+      if (user) setWelcomeName(user.name);
+
+      refreshUI();
+      switchSection("dashboard");
+    })();
+  </script>
+</body>
+</html>
